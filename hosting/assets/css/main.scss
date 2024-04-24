@@ -1,0 +1,14 @@
+@use '@/assets/css/color';
+
+body {
+  margin: 0;
+  background-color: color.$light-background-color;
+}
+
+// TODO: dark mode
+// @media (prefers-color-scheme: dark) {
+//   body {
+//     background-color: color.$dark-background-color;
+//     color: color.$dark-text-color;
+//   }
+// }

@@ -1,0 +1,20 @@
+name: prettier check
+on: pull_request
+jobs:
+  check:
+    if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8.2.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "pnpm"
+          cache-dependency-path: "hosting/pnpm-lock.yaml"
+      - run: |
+          pnpm install --frozen-lockfile
+          pnpm prettier:check
+        working-directory: hosting

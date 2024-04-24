@@ -1,0 +1,32 @@
+name: shutdown prd
+on: workflow_dispatch
+jobs:
+  disable_hosting:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_TOOLS_VERSION: 13.3.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8.2.0
+      # cacheするほどでもない
+      - name: cache global node_modules
+        id: cache-global-node-modules
+        uses: actions/cache@v4
+        with:
+          # NOTE: pathの参考
+          # ```bash
+          # which firebase
+          # /home/runner/setup-pnpm/node_modules/.bin/firebase
+          # ```
+          path: |
+            /home/runner/setup-pnpm/node_modules
+          key: ${{ runner.os }}-disable_hosting-cache-global-node-modules_firebase-tools@${{env.FIREBASE_TOOLS_VERSION}}
+      - if: steps.cache-global-node-modules.outputs.cache-hit != 'true'
+        run: pnpm add -g firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }}
+      - run: firebase hosting:disable --force --project ${PROJECT_NAME} --token "${FIREBASE_TOKEN}"
+        env:
+          PROJECT_NAME: ${{ vars.FIREBASE_PROJECT_NAME }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
